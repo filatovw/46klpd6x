@@ -23,13 +23,13 @@ Start service:
 
     make api/up
 
-Stop running service and shutdown the infrastructure:
+Stop running service
 
-    make api/up
+    make api/down
 
 Start infrastructure:
 
-    make infra/down
+    make infra/up
 
 Stop running service and shutdown the infrastructure:
 
