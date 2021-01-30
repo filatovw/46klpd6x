@@ -36,6 +36,7 @@ func main() {
 	if err != nil {
 		sugar.Fatalf("failed to get config for application")
 	}
+
 	api := api.New(ctx, sugar, config)
 	go func() {
 		if err := api.Serve(); err != nil {

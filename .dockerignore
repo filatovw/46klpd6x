@@ -15,5 +15,5 @@
 # vendor/
 
 db/
-docker/env_vars/
 .git/
+bin/
