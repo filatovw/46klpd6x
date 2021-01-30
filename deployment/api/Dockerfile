@@ -21,7 +21,7 @@ ENV APP_USER=executor APP_GROUP=executor
 ENV ROOT_USER=root ROOT_GROUP=root
 ENV APP=${APP}
 
-WORKDIR /usr/bin/
+WORKDIR /usr/app/
 COPY --from=builder /usr/app/bin/${APP} .
 COPY ./deployment/${APP}/entrypoint.sh /entrypoint.sh
 USER ${ROOT_USER}

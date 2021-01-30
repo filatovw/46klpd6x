@@ -5,10 +5,11 @@ VERSION ?= $(shell cat ./VERSION)
 BUILDTIME = $(shell date -u +"%Y%m%d%H%M%S")
 VERSION_REVISION ?= ${VERSION}-${REVISION}
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
-IMAGE := $(REPO):$(VERSION)
+API_IMAGE := $(REPO):$(VERSION)
 
 DOCKERHUB :=
 DEPLOYMENT_DIR := deployment/
+GO_IMAGE := golang:1.15.7
 
 BIN_DIR ?= bin/
 
@@ -17,12 +18,21 @@ BIN_DIR ?= bin/
 api/build:
 	go build -o $(BIN_DIR)$(APP) ./cmd/$(APP)
 
+##    api/test - test api service
+api/test:
+	go test -v -race ./...
+
+##    api/lint - run linter
+api/lint:
+	go vet ./...
+
+
 ##    api/up - up service
 .PHONY: api/up
 api/up: api/build
 	$(BIN_DIR)$(APP)
 
-##    docker/api/build - build api service in docker
+##    docker/api/build - build API service container
 .PHONY: docker/api/build
 docker/api/build:
 	docker build \
@@ -37,7 +47,7 @@ docker/api/build:
 		-t $(DOCKERHUB)$(APP):$(BRANCH) \
 		-t $(DOCKERHUB)$(APP):$(VERSION_REVISION) .
 
-##    docker/api/up - up service in docker
+##    docker/api/up - run API service in docker
 docker/api/up:
 	docker-compose up -d $(APP)
 
@@ -49,6 +59,13 @@ docker/api/down:
 docker/logs:
 	docker-compose logs -f
 
+##    docker/<local target> - universal docker wrapper for local targets
+docker/%:
+	docker run --rm \
+		-v $(PWD)/:/usr/app/ \
+		-w /usr/app/ \
+		-e APP=$(APP) \
+		${GO_IMAGE} make $*
 
 ## -
 ## help - this message
