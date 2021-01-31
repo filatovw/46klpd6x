@@ -9,6 +9,7 @@ import (
 
 	"github.com/filatovw/46klpd6x/app/api"
 	"github.com/filatovw/46klpd6x/internal/repository/postgres"
+	"github.com/filatovw/46klpd6x/internal/repository/redis"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -49,7 +50,7 @@ func main() {
 	if err != nil {
 		sugar.Fatalf("failed to get config for Postgres")
 	}
-	pg := postgres.New(ctx, sugar, pgConfig)
+	pg := postgres.New(sugar, pgConfig)
 	if err := pg.Connect(); err != nil {
 		sugar.Fatalf("failed to connect to the Postgres instance: %s", err)
 	}
@@ -57,6 +58,18 @@ func main() {
 	if err := pg.Ping(); err != nil {
 		sugar.Fatalf("Unable to Ping DB: %s", err)
 	}
+
+	// connect to Redis
+	redisConfig, err := redis.LoadConfig()
+	if err != nil {
+		sugar.Fatalf("failed to get config for Redis")
+	}
+	redis := redis.New(sugar, *redisConfig)
+	redis.Connect()
+	if err := redis.Ping(ctx); err != nil {
+		sugar.Fatalf("Unable to Ping DB: %s", err)
+	}
+	defer redis.Disconnect()
 
 	// create api server
 	api := api.New(ctx, sugar, apiConfig)

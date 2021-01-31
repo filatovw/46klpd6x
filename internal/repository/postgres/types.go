@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"io"
 	"os"
 	"time"
@@ -37,9 +38,9 @@ type Repository interface {
 	Connect() error
 	Disconnect() error
 	Ping() error
-	CreateUser(User) error
-	UserStream(int) (io.ReadCloser, error)
-	UserWithOffset(int, int) ([]User, error)
-	DeleteUserByID(int) error
-	DeleteUserByEmail(string) error
+	CreateUser(context.Context, User) error
+	UserStream(context.Context, int) (io.ReadCloser, error)
+	UserWithOffset(context.Context, int, int) ([]User, error)
+	DeleteUserByID(context.Context, int) error
+	DeleteUserByEmail(context.Context, string) error
 }
