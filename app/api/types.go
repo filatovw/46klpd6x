@@ -1,14 +1,16 @@
-package config
+package api
 
 import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
 // Config of API server
 type Config struct {
+	Debug          bool
 	Host           string
 	Port           int
 	ReadTimeout    time.Duration
@@ -21,15 +23,19 @@ func (c *Config) ConnectionString() string {
 	return fmt.Sprintf("%s:%d", c.Host, c.Port)
 }
 
-// Load config from environment variables
-func Load() (*Config, error) {
+// LoadConfig config from environment variables
+func LoadConfig() (*Config, error) {
 	var err error
 	config := &Config{
+		Debug:          false,
 		Host:           "localhost",
 		Port:           8000,
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
+	}
+	if val, ok := os.LookupEnv("API_DEBUG"); ok {
+		config.Debug = val == "1" || strings.ToLower(val) == "true"
 	}
 	if val, ok := os.LookupEnv("API_HOST"); ok {
 		config.Host = val
@@ -54,10 +60,10 @@ func Load() (*Config, error) {
 		}
 		config.WriteTimeout = time.Duration(writeTimeout) * time.Second
 	}
-	if val, ok := os.LookupEnv("MAX_HEADER_BYTES"); ok {
+	if val, ok := os.LookupEnv("API_MAX_HEADER_BYTES"); ok {
 		config.MaxHeaderBytes, err = strconv.Atoi(val)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse MAX_HEADER_BYTES: %w", err)
+			return nil, fmt.Errorf("failed to parse API_MAX_HEADER_BYTES: %w", err)
 		}
 	}
 	return config, nil
