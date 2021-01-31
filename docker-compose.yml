@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 services:
   api:
     image: api:latest
@@ -6,3 +6,55 @@ services:
       - 8000:8000
     env_file:
       - config/api.env
+      - config/pg.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12.5
+    ports:
+      - 5432:5432
+    env_file:
+      - config/pg.env
+    volumes:
+      - ./volume/pg/:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    env_file:
+      - config/pg.env
+
+  db-migrate:
+    image: amacneil/dbmate
+    env_file:
+      - ./config/pg.env
+    volumes:
+      - ./migrations:/db/migrations
+    command: --wait-timeout=60s up
+    depends_on:
+      - db
+    restart: on-failure
+
+  db-rollback:
+    image: amacneil/dbmate
+    env_file:
+      - ./config/pg.env
+    volumes:
+      - ./migrations:/db/migrations
+    command: --wait-timeout=60s down
+    depends_on:
+      - db
+    restart: on-failure
+
+  db-drop:
+    image: amacneil/dbmate
+    env_file:
+      - ./config/pg.env
+    volumes:
+      - ./migrations:/db/migrations
+    command: drop
+    depends_on:
+      - db

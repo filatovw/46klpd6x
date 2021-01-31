@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/filatovw/46klpd6x/app/api/config"
 	"go.uber.org/zap"
 )
 
@@ -15,14 +14,14 @@ type API struct {
 	ctx    context.Context
 	server *http.Server
 	logger *zap.SugaredLogger
-	config *config.Config
+	config *Config
 }
 
 // Serve start server
 func (a *API) Serve() error {
 	a.logger.Infow("starting server", "connection_string", a.config.ConnectionString())
 	if err := a.server.ListenAndServe(); err != nil {
-		return fmt.Errorf("failed to start server: %w", err)
+		return fmt.Errorf("ListenAndServe: %w", err)
 	}
 	return nil
 }
@@ -34,7 +33,7 @@ func (a *API) Shutdown() error {
 }
 
 // New - instantiate API HTTP server
-func New(ctx context.Context, logger *zap.SugaredLogger, config *config.Config) API {
+func New(ctx context.Context, logger *zap.SugaredLogger, config *Config) API {
 	server := &http.Server{
 		Addr:           config.ConnectionString(),
 		Handler:        routes(),
