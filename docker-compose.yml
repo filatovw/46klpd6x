@@ -9,6 +9,7 @@ services:
       - config/pg.env
     depends_on:
       - db
+      - cache
 
   db:
     image: postgres:12.5
@@ -58,3 +59,11 @@ services:
     command: drop
     depends_on:
       - db
+
+  cache:
+    image: redis:6.0.10-alpine3.12
+    command: redis-server --appendonly yes --requirepass redispass321
+    ports:
+      - 6379:6379
+    volumes:
+      - ./volume/redis/:/data

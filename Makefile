@@ -30,7 +30,13 @@ api/build:
 
 ##    api/test - test api service
 api/test:
-	go test -v -race ./...
+	go test -v -tags=!integration -race ./...
+
+##    api/integration - run integration tests
+api/integration: docker/infra/down docker/infra/up
+	go test -tags=integration -v ./...
+	-$(MAKE) docker/infra/down
+
 
 ##    api/lint - run linter
 api/lint:
@@ -66,11 +72,11 @@ docker/api/down:
 
 ##    docker/infra/up - run API service in docker
 docker/infra/up:
-	$(DC) up -d db db-migrate
+	$(DC) up -d db db-migrate cache
 
 ##    docker/infra/down - stop running API container
 docker/infra/down:
-	$(DC) stop db
+	$(DC) stop db db-migrate cache
 
 ##    docker/logs - watch logs
 docker/logs:
@@ -101,7 +107,6 @@ migration/down:
 ##    migration/drop - drop database
 migration/drop:
 	$(DC) up db-drop
-
 
 
 ## -

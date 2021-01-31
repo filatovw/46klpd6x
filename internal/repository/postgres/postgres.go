@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 
@@ -14,11 +13,10 @@ import (
 
 // Postgres structure
 type Postgres struct {
-	context context.Context
-	logger  *zap.SugaredLogger
-	config  *Config
-	conn    *sql.DB
-	db      *gorm.DB
+	logger *zap.SugaredLogger
+	config *Config
+	conn   *sql.DB
+	db     *gorm.DB
 }
 
 // Connect to the Postgres database
@@ -48,10 +46,9 @@ func (p *Postgres) Ping() error {
 }
 
 // New Postgres instance
-func New(ctx context.Context, logger *zap.SugaredLogger, config *Config) Postgres {
+func New(logger *zap.SugaredLogger, config *Config) Postgres {
 	return Postgres{
-		context: ctx,
-		logger:  logger,
-		config:  config,
+		logger: logger,
+		config: config,
 	}
 }
