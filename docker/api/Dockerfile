@@ -23,7 +23,7 @@ ENV APP=${APP}
 
 WORKDIR /usr/app/
 COPY --from=builder /usr/app/bin/${APP} .
-COPY ./deployment/${APP}/entrypoint.sh /entrypoint.sh
+COPY ./docker/${APP}/entrypoint.sh /entrypoint.sh
 USER ${ROOT_USER}
 RUN chmod +x /entrypoint.sh
 USER ${APP_USER}
