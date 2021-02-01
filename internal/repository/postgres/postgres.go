@@ -1,8 +1,10 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"io"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
@@ -44,6 +46,15 @@ func (p *Postgres) Disconnect() error {
 func (p *Postgres) Ping() error {
 	return p.conn.Ping()
 }
+func (p *Postgres) CreateUser(ctx context.Context, user User) error { return nil }
+func (p *Postgres) UserStream(ctx context.Context, offset int) (io.ReadCloser, error) {
+	return nil, nil
+}
+func (p *Postgres) UserWithOffset(ctx context.Context, offset int, limit int) ([]User, error) {
+	return []User{}, nil
+}
+func (p *Postgres) DeleteUserByID(ctx context.Context, id int) error          { return nil }
+func (p *Postgres) DeleteUserByEmail(ctx context.Context, email string) error { return nil }
 
 // New Postgres instance
 func New(logger *zap.SugaredLogger, config *Config) Postgres {

@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -73,9 +74,9 @@ type Token string
 
 // Repository works with postgres database
 type Repository interface {
-	Connect() error
+	Connect()
 	Disconnect() error
-	Ping() error
+	Ping(context.Context) error
 
 	AddToken(Token, int) error
 	HasToken(Token) bool

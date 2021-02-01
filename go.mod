@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/go-redis/redis/v8 v8.4.11
-	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/joho/godotenv v1.3.0
 	go.uber.org/zap v1.16.0

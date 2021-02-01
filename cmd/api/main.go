@@ -10,6 +10,8 @@ import (
 	"github.com/filatovw/46klpd6x/app/api"
 	"github.com/filatovw/46klpd6x/internal/repository/postgres"
 	"github.com/filatovw/46klpd6x/internal/repository/redis"
+	"github.com/filatovw/46klpd6x/internal/service/auth"
+	"github.com/filatovw/46klpd6x/internal/service/user"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -71,8 +73,13 @@ func main() {
 	}
 	defer redis.Disconnect()
 
+	// User service
+	userService := user.New(sugar, &pg, &redis)
+	// Auth service
+	authService := auth.New(sugar, &pg, &redis)
+
 	// create api server
-	api := api.New(ctx, sugar, apiConfig)
+	api := api.New(ctx, sugar, apiConfig, &userService, &authService)
 	go func() {
 		if err := api.Serve(); err != nil {
 			sugar.Warnf("api service stopped: %s", err)

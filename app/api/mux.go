@@ -1,25 +1,57 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/filatovw/46klpd6x/internal/service/auth"
+	"github.com/filatovw/46klpd6x/internal/service/user"
+	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 )
 
-// HealthCheckResponse status of server availability
-type HealthCheckResponse struct {
-	Status string `json:"status"`
+func routes(logger *zap.SugaredLogger, userService user.Service, authService auth.Service) *mux.Router {
+	r := mux.NewRouter()
+	r.Handle("/users", CreateUserHandler{logger, userService}).Methods("POST")
+	r.Handle("/users", DeleteUserHandler{logger, userService}).Methods("DELETE")
+	r.Handle("/users", ListUsersHandler{logger, userService}).Methods("GET")
+
+	sub := r.PathPrefix("/auth").Subrouter()
+	sub.Handle("/signin", SignInHandler{logger, authService}).Methods("POST")
+	sub.Handle("/signout", SignOutHandler{logger, authService}).Methods("POST")
+	return r
 }
 
-func routes() *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		response, err := json.Marshal(HealthCheckResponse{Status: "OK"})
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(response)
-	})
-	return mux
+type CreateUserHandler struct {
+	logger      *zap.SugaredLogger
+	userService user.Service
 }
+
+func (h CreateUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
+
+type DeleteUserHandler struct {
+	logger      *zap.SugaredLogger
+	userService user.Service
+}
+
+func (h DeleteUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
+
+type ListUsersHandler struct {
+	logger      *zap.SugaredLogger
+	userService user.Service
+}
+
+func (h ListUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
+
+type SignInHandler struct {
+	logger      *zap.SugaredLogger
+	authService auth.Service
+}
+
+func (h SignInHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
+
+type SignOutHandler struct {
+	logger      *zap.SugaredLogger
+	authService auth.Service
+}
+
+func (h SignOutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {}

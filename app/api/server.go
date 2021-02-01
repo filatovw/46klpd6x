@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/filatovw/46klpd6x/internal/service/auth"
+	"github.com/filatovw/46klpd6x/internal/service/user"
 	"go.uber.org/zap"
 )
 
@@ -33,10 +35,10 @@ func (a *API) Shutdown() error {
 }
 
 // New - instantiate API HTTP server
-func New(ctx context.Context, logger *zap.SugaredLogger, config *Config) API {
+func New(ctx context.Context, logger *zap.SugaredLogger, config *Config, userService user.Service, authService auth.Service) API {
 	server := &http.Server{
 		Addr:           config.ConnectionString(),
-		Handler:        routes(),
+		Handler:        routes(logger, userService, authService),
 		ReadTimeout:    time.Duration(config.ReadTimeout),
 		WriteTimeout:   time.Duration(config.WriteTimeout),
 		MaxHeaderBytes: config.MaxHeaderBytes,

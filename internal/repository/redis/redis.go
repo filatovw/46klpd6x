@@ -41,6 +41,10 @@ func (r *Redis) Disconnect() error {
 	return r.client.Close()
 }
 
+func (r *Redis) AddToken(token Token, ttl int) error { return nil }
+func (r Redis) HasToken(token Token) bool            { return false }
+func (r *Redis) DeleteToken(token Token) error       { return nil }
+
 // New Redis repository
 func New(logger *zap.SugaredLogger, config Config) Redis {
 	return Redis{
