@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/filatovw/46klpd6x/internal/helpers"
 	"github.com/filatovw/46klpd6x/internal/service/auth"
 )
 
@@ -23,7 +24,7 @@ func (m *ContentTypeMiddleware) Middleware(next http.Handler) http.Handler {
 				break
 			}
 		}
-		writeResponse(w, "bad request", http.StatusUnsupportedMediaType)
+		helpers.WriteResponse(w, "bad request", http.StatusUnsupportedMediaType)
 	})
 }
 
@@ -50,16 +51,16 @@ func (m *AuthMiddleware) Middleware(next http.Handler) http.Handler {
 		bearerToken := strings.Trim(r.Header.Get("Authorization"), " ")
 		token := bearerTokenPattern.Find([]byte(bearerToken))
 		if token == nil || len(token) == 0 {
-			writeResponse(w, "unauthorized", http.StatusUnauthorized)
+			helpers.WriteResponse(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 		user, err := m.authService.FindByToken(string(token))
 		if err != nil || user == nil {
-			writeResponse(w, "unauthorized", http.StatusUnauthorized)
+			helpers.WriteResponse(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 		if m.admin && !m.authService.IsAdminUser(*user) {
-			writeResponse(w, "forbidden", http.StatusForbidden)
+			helpers.WriteResponse(w, "forbidden", http.StatusForbidden)
 		}
 		next.ServeHTTP(w, r)
 	})
