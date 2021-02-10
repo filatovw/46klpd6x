@@ -10,6 +10,8 @@ import (
 	"github.com/filatovw/46klpd6x/app/api"
 	"github.com/filatovw/46klpd6x/internal/repository/postgres"
 	"github.com/filatovw/46klpd6x/internal/repository/redis"
+	"github.com/filatovw/46klpd6x/internal/service/auth"
+	"github.com/filatovw/46klpd6x/internal/service/user"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -51,11 +53,11 @@ func main() {
 		sugar.Fatalf("failed to get config for Postgres")
 	}
 	pg := postgres.New(sugar, pgConfig)
-	if err := pg.Connect(); err != nil {
+	if err := pg.Connect(ctx); err != nil {
 		sugar.Fatalf("failed to connect to the Postgres instance: %s", err)
 	}
-	defer pg.Disconnect()
-	if err := pg.Ping(); err != nil {
+	defer pg.Disconnect(ctx)
+	if err := pg.Ping(ctx); err != nil {
 		sugar.Fatalf("Unable to Ping DB: %s", err)
 	}
 
@@ -65,14 +67,19 @@ func main() {
 		sugar.Fatalf("failed to get config for Redis")
 	}
 	redis := redis.New(sugar, *redisConfig)
-	redis.Connect()
+	redis.Connect(ctx)
 	if err := redis.Ping(ctx); err != nil {
 		sugar.Fatalf("Unable to Ping DB: %s", err)
 	}
-	defer redis.Disconnect()
+	defer redis.Disconnect(ctx)
+
+	// User service
+	userService := user.New(sugar, &pg, &redis)
+	// Auth service
+	authService := auth.New(sugar, &pg, &redis)
 
 	// create api server
-	api := api.New(ctx, sugar, apiConfig)
+	api := api.New(ctx, sugar, apiConfig, &userService, &authService)
 	go func() {
 		if err := api.Serve(); err != nil {
 			sugar.Warnf("api service stopped: %s", err)

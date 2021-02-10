@@ -67,17 +67,3 @@ type User struct {
 	FullName string
 	Email    string
 }
-
-// Token entity
-type Token string
-
-// Repository works with postgres database
-type Repository interface {
-	Connect() error
-	Disconnect() error
-	Ping() error
-
-	AddToken(Token, int) error
-	HasToken(Token) bool
-	DeleteToken(Token) error
-}

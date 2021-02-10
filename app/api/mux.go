@@ -1,25 +1,25 @@
 package api
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/filatovw/46klpd6x/app/api/handlers"
+	"github.com/filatovw/46klpd6x/pkg/service"
+	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 )
 
-// HealthCheckResponse status of server availability
-type HealthCheckResponse struct {
-	Status string `json:"status"`
-}
+func routes(logger *zap.SugaredLogger, userService service.UserManager, authService service.AuthManager) *mux.Router {
+	r := mux.NewRouter()
+	cmw := ContentTypeMiddleware{ContentTypes: []string{"application/json"}}
+	r.Use(cmw.Middleware)
 
-func routes() *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		response, err := json.Marshal(HealthCheckResponse{Status: "OK"})
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(response)
-	})
-	return mux
+	anyAmw := AuthMiddleware{authService: authService, admin: false}
+	adminAmw := AuthMiddleware{authService: authService, admin: true}
+	r.Handle("/users/", handlers.CreateUserHandler{logger, userService}).Methods("POST")
+	r.Handle("/users/", adminAmw.Middleware(handlers.DeleteUserHandler{logger, userService})).Methods("DELETE")
+	r.Handle("/users/", adminAmw.Middleware(handlers.ListUsersHandler{logger, userService})).Methods("GET")
+
+	sub := r.PathPrefix("/auth/").Subrouter()
+	sub.Handle("/signin/", handlers.SignInHandler{logger, authService}).Methods("POST")
+	sub.Handle("/signout/", anyAmw.Middleware(handlers.SignOutHandler{logger, authService})).Methods("POST")
+	return r
 }

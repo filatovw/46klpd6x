@@ -1,9 +1,12 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"io"
 
+	"github.com/filatovw/46klpd6x/pkg/repository"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
 	"go.uber.org/zap"
@@ -20,7 +23,7 @@ type Postgres struct {
 }
 
 // Connect to the Postgres database
-func (p *Postgres) Connect() error {
+func (p *Postgres) Connect(_ context.Context) error {
 	pgxConfig, err := pgx.ParseConfig(p.config.ConnectionString)
 	if err != nil {
 		return fmt.Errorf("unable to parse postgres connection string: %s", err)
@@ -36,14 +39,23 @@ func (p *Postgres) Connect() error {
 }
 
 // Disconnect database
-func (p *Postgres) Disconnect() error {
+func (p *Postgres) Disconnect(_ context.Context) error {
 	return p.conn.Close()
 }
 
 // Ping database
-func (p *Postgres) Ping() error {
+func (p *Postgres) Ping(_ context.Context) error {
 	return p.conn.Ping()
 }
+func (p *Postgres) CreateUser(ctx context.Context, user repository.User) error { return nil }
+func (p *Postgres) UserStream(ctx context.Context, offset int) (io.ReadCloser, error) {
+	return nil, nil
+}
+func (p *Postgres) UserWithOffset(ctx context.Context, offset int, limit int) ([]repository.User, error) {
+	return []repository.User{}, nil
+}
+func (p *Postgres) DeleteUserByID(ctx context.Context, id int) error          { return nil }
+func (p *Postgres) DeleteUserByEmail(ctx context.Context, email string) error { return nil }
 
 // New Postgres instance
 func New(logger *zap.SugaredLogger, config *Config) Postgres {
