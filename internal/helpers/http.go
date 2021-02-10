@@ -7,11 +7,11 @@ import (
 
 // WriteResponse generic response writer
 func WriteResponse(w http.ResponseWriter, response interface{}, status int) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		panic(err)
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(status)
 }
 
 // WriteOK 200 response

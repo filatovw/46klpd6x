@@ -3,42 +3,30 @@ package auth
 import (
 	"strings"
 
-	"github.com/filatovw/46klpd6x/internal/repository/postgres"
-	"github.com/filatovw/46klpd6x/internal/repository/redis"
+	"github.com/filatovw/46klpd6x/pkg/repository"
+	"github.com/filatovw/46klpd6x/pkg/service"
 	"go.uber.org/zap"
 )
 
-// User model in Auth service
-type User struct {
-	Email string
-}
-
-// Service auth user, check permission
-type Service interface {
-	SignIn(User) (string, error)
-	SignOut(string) error
-	FindByToken(string) (*User, error)
-	IsAdminUser(User) bool
-}
-
-// AuthService implementation of auth service
-type AuthService struct {
+// Service implementation of auth service
+type Service struct {
 	logger *zap.SugaredLogger
-	db     postgres.Repository
-	cache  redis.Repository
+	db     repository.Vault
+	cache  repository.Cache
 }
 
-func New(logger *zap.SugaredLogger, db postgres.Repository, cache redis.Repository) AuthService {
-	return AuthService{
+// New auth service
+func New(logger *zap.SugaredLogger, db repository.Vault, cache repository.Cache) Service {
+	return Service{
 		logger: logger,
 		db:     db,
 		cache:  cache,
 	}
 }
 
-func (s *AuthService) SignIn(user User) (string, error)        { return "", nil }
-func (s *AuthService) SignOut(token string) error              { return nil }
-func (s *AuthService) FindByToken(token string) (*User, error) { return nil, nil }
-func (s *AuthService) IsAdminUser(user User) bool {
+func (s *Service) SignIn(user service.User) (string, error)        { return "", nil }
+func (s *Service) SignOut(token string) error                      { return nil }
+func (s *Service) FindByToken(token string) (*service.User, error) { return nil, nil }
+func (s *Service) IsAdminUser(user service.User) bool {
 	return strings.HasSuffix(user.Email, "@test.com")
 }

@@ -1,8 +1,6 @@
 package postgres
 
 import (
-	"context"
-	"io"
 	"os"
 	"time"
 )
@@ -31,16 +29,4 @@ type User struct {
 	CreatedAt time.Time
 	DeletedAt *time.Time
 	IsDeleted bool
-}
-
-// Repository works with postgres database
-type Repository interface {
-	Connect() error
-	Disconnect() error
-	Ping() error
-	CreateUser(context.Context, User) error
-	UserStream(context.Context, int) (io.ReadCloser, error)
-	UserWithOffset(context.Context, int, int) ([]User, error)
-	DeleteUserByID(context.Context, int) error
-	DeleteUserByEmail(context.Context, string) error
 }

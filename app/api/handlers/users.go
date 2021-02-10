@@ -6,14 +6,14 @@ import (
 	"net/http"
 
 	"github.com/filatovw/46klpd6x/internal/helpers"
-	"github.com/filatovw/46klpd6x/internal/service/user"
+	"github.com/filatovw/46klpd6x/pkg/service"
 	"go.uber.org/zap"
 )
 
 // CreateUserHandler create one user
 type CreateUserHandler struct {
 	Logger      *zap.SugaredLogger
-	UserService user.Service
+	UserService service.UserManager
 }
 
 type createUserRequest struct {
@@ -21,6 +21,8 @@ type createUserRequest struct {
 	Password string `json:"password"`
 	FullName string `json:"fullname"`
 }
+
+type genericResponse string
 
 func (h CreateUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var req createUserRequest
@@ -30,18 +32,18 @@ func (h CreateUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		helpers.WriteBadRequest(w, "can't read body")
 		return
 	}
-	item := user.User{}
+	item := service.User{}
 	if err := h.UserService.CreateUser(item); err != nil {
 		helpers.WriteServerError(w, "failed to create user")
 		return
 	}
-	helpers.WriteOK(w, "OK")
+	helpers.WriteOK(w, genericResponse("OK"))
 }
 
 // DeleteUserHandler delete one user by email
 type DeleteUserHandler struct {
 	Logger      *zap.SugaredLogger
-	UserService user.Service
+	UserService service.UserManager
 }
 
 type deleteUserRequest struct {
@@ -56,12 +58,12 @@ func (h DeleteUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		helpers.WriteBadRequest(w, "can't read body")
 		return
 	}
-	item := user.User{}
+	item := service.User{}
 	if err := h.UserService.DeleteUser(item); err != nil {
 		helpers.WriteServerError(w, "failed to create user")
 		return
 	}
-	helpers.WriteOK(w, "OK")
+	helpers.WriteOK(w, genericResponse("OK"))
 }
 
 type listUsersRequest struct {
@@ -78,7 +80,7 @@ type listUsersResponse []User
 // ListUsersHandler list users in a system
 type ListUsersHandler struct {
 	Logger      *zap.SugaredLogger
-	UserService user.Service
+	UserService service.UserManager
 }
 
 func (h ListUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

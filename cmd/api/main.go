@@ -53,11 +53,11 @@ func main() {
 		sugar.Fatalf("failed to get config for Postgres")
 	}
 	pg := postgres.New(sugar, pgConfig)
-	if err := pg.Connect(); err != nil {
+	if err := pg.Connect(ctx); err != nil {
 		sugar.Fatalf("failed to connect to the Postgres instance: %s", err)
 	}
-	defer pg.Disconnect()
-	if err := pg.Ping(); err != nil {
+	defer pg.Disconnect(ctx)
+	if err := pg.Ping(ctx); err != nil {
 		sugar.Fatalf("Unable to Ping DB: %s", err)
 	}
 
@@ -67,11 +67,11 @@ func main() {
 		sugar.Fatalf("failed to get config for Redis")
 	}
 	redis := redis.New(sugar, *redisConfig)
-	redis.Connect()
+	redis.Connect(ctx)
 	if err := redis.Ping(ctx); err != nil {
 		sugar.Fatalf("Unable to Ping DB: %s", err)
 	}
-	defer redis.Disconnect()
+	defer redis.Disconnect(ctx)
 
 	// User service
 	userService := user.New(sugar, &pg, &redis)

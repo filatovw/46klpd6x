@@ -2,13 +2,12 @@ package api
 
 import (
 	"github.com/filatovw/46klpd6x/app/api/handlers"
-	"github.com/filatovw/46klpd6x/internal/service/auth"
-	"github.com/filatovw/46klpd6x/internal/service/user"
+	"github.com/filatovw/46klpd6x/pkg/service"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
 
-func routes(logger *zap.SugaredLogger, userService user.Service, authService auth.Service) *mux.Router {
+func routes(logger *zap.SugaredLogger, userService service.UserManager, authService service.AuthManager) *mux.Router {
 	r := mux.NewRouter()
 	cmw := ContentTypeMiddleware{ContentTypes: []string{"application/json"}}
 	r.Use(cmw.Middleware)

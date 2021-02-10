@@ -1,34 +1,27 @@
 package user
 
 import (
-	"github.com/filatovw/46klpd6x/internal/repository/postgres"
-	"github.com/filatovw/46klpd6x/internal/repository/redis"
+	"github.com/filatovw/46klpd6x/pkg/repository"
+	"github.com/filatovw/46klpd6x/pkg/service"
 	"go.uber.org/zap"
 )
 
-type User struct {
-}
-
-type Service interface {
-	CreateUser(User) error
-	DeleteUser(User) error
-	Users(int, int) ([]User, error)
-}
-
-type UserService struct {
+// Service that operates with user profiles
+type Service struct {
 	logger *zap.SugaredLogger
-	db     postgres.Repository
-	cache  redis.Repository
+	db     repository.Vault
+	cache  repository.Cache
 }
 
-func New(logger *zap.SugaredLogger, db postgres.Repository, cache redis.Repository) UserService {
-	return UserService{
+// New user service
+func New(logger *zap.SugaredLogger, db repository.Vault, cache repository.Cache) Service {
+	return Service{
 		logger: logger,
 		db:     db,
 		cache:  cache,
 	}
 }
 
-func (s *UserService) CreateUser(user User) error                  { return nil }
-func (s *UserService) DeleteUser(user User) error                  { return nil }
-func (s *UserService) Users(limit int, offset int) ([]User, error) { return []User{}, nil }
+func (s *Service) CreateUser(user service.User) error                  { return nil }
+func (s *Service) DeleteUser(user service.User) error                  { return nil }
+func (s *Service) Users(limit int, offset int) ([]service.User, error) { return []service.User{}, nil }

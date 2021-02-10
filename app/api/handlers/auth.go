@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/filatovw/46klpd6x/internal/helpers"
-	"github.com/filatovw/46klpd6x/internal/service/auth"
+	"github.com/filatovw/46klpd6x/pkg/service"
 	"go.uber.org/zap"
 )
 
@@ -17,7 +17,7 @@ type signInRequest struct {
 // SignInHandler sign-in user by (email, password)
 type SignInHandler struct {
 	Logger      *zap.SugaredLogger
-	AuthService auth.Service
+	AuthService service.AuthManager
 }
 
 func (h SignInHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func (h SignInHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		helpers.WriteBadRequest(w, "can't read body")
 		return
 	}
-	item := auth.User{}
+	item := service.User{}
 	token, err := h.AuthService.SignIn(item)
 	if err != nil {
 		h.Logger.Errorf("failed to sign in user: %s", err)
@@ -41,7 +41,7 @@ func (h SignInHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // SignOutHandler sign-out user
 type SignOutHandler struct {
 	Logger      *zap.SugaredLogger
-	AuthService auth.Service
+	AuthService service.AuthManager
 }
 
 func (h SignOutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

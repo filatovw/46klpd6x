@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/filatovw/46klpd6x/internal/helpers"
-	"github.com/filatovw/46klpd6x/internal/service/auth"
+	"github.com/filatovw/46klpd6x/pkg/service"
 )
 
 // ContentTypeMiddleware should filter out unsupported content types
@@ -41,7 +41,7 @@ func init() {
 // AuthMiddleware check user authorization
 type AuthMiddleware struct {
 	pattern     *regexp.Regexp
-	authService auth.Service
+	authService service.AuthManager
 	admin       bool
 }
 

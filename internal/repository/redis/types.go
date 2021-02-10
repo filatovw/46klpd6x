@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -67,18 +66,4 @@ type User struct {
 	ID       int
 	FullName string
 	Email    string
-}
-
-// Token entity
-type Token string
-
-// Repository works with postgres database
-type Repository interface {
-	Connect()
-	Disconnect() error
-	Ping(context.Context) error
-
-	AddToken(Token, int) error
-	HasToken(Token) bool
-	DeleteToken(Token) error
 }
